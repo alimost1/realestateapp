@@ -1,0 +1,125 @@
+<% layout('layouts/app') -%>
+
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-900">Messages</h1>
+        <div class="flex space-x-2">
+            <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                <option>All Channels</option>
+                <option>Internal</option>
+                <option>WhatsApp</option>
+                <option>Email</option>
+                <option>Airbnb</option>
+                <option>Booking.com</option>
+            </select>
+            <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                <option>All Status</option>
+                <option>Unread</option>
+                <option>Read</option>
+                <option>Replied</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Messages List -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="divide-y divide-gray-200">
+            <% messages.forEach(message => { %>
+                <div class="p-6 hover:bg-gray-50 <%= message.status === 'unread' ? 'bg-blue-50' : '' %>">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-3 mb-2">
+                                <div class="flex-shrink-0">
+                                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                                        <span class="text-white text-sm font-medium">
+                                            <%= message.sender_name.charAt(0).toUpperCase() %>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900"><%= message.sender_name %></p>
+                                    <p class="text-sm text-gray-500"><%= message.sender_email %></p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                        <% if (message.channel === 'internal') { %>bg-gray-100 text-gray-800<% } %>
+                                        <% if (message.channel === 'whatsapp') { %>bg-green-100 text-green-800<% } %>
+                                        <% if (message.channel === 'email') { %>bg-blue-100 text-blue-800<% } %>
+                                        <% if (message.channel === 'airbnb') { %>bg-red-100 text-red-800<% } %>
+                                        <% if (message.channel === 'booking.com') { %>bg-purple-100 text-purple-800<% } %>">
+                                        <%= message.channel %>
+                                    </span>
+                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                        <% if (message.status === 'unread') { %>bg-yellow-100 text-yellow-800<% } %>
+                                        <% if (message.status === 'read') { %>bg-green-100 text-green-800<% } %>
+                                        <% if (message.status === 'replied') { %>bg-blue-100 text-blue-800<% } %>">
+                                        <%= message.status %>
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <% if (message.property_name) { %>
+                                    <p class="text-sm text-gray-600 mb-1">
+                                        <i data-lucide="building" class="w-4 h-4 inline mr-1"></i>
+                                        <%= message.property_name %> - <%= message.guest_name %>
+                                    </p>
+                                <% } %>
+                                <p class="text-gray-800"><%= message.message %></p>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <p class="text-sm text-gray-500">
+                                    <%= new Date(message.created_at).toLocaleString() %>
+                                </p>
+                                <div class="flex space-x-2">
+                                    <% if (message.status === 'unread') { %>
+                                        <button onclick="markAsRead(<%= message.id %>)" 
+                                                class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                            Mark as Read
+                                        </button>
+                                    <% } %>
+                                    <button class="text-green-600 hover:text-green-800 text-sm font-medium">
+                                        Reply
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+
+    <% if (messages.length === 0) { %>
+        <div class="text-center py-12">
+            <i data-lucide="message-circle" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No messages yet</h3>
+            <p class="text-gray-600">Guest messages will appear here from all connected channels.</p>
+        </div>
+    <% } %>
+</div>
+
+<script>
+function markAsRead(messageId) {
+    fetch(`/messages/${messageId}/read`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error marking message as read');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error marking message as read');
+    });
+}
+</script>

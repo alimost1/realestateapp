@@ -1,0 +1,71 @@
+<% layout('layouts/app') -%>
+
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-900">Properties</h1>
+        <a href="/properties/create" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
+            <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+            Add Property
+        </a>
+    </div>
+
+    <!-- Properties Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% properties.forEach(property => { %>
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                <div class="h-48 bg-gradient-to-r from-blue-400 to-purple-500"></div>
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-xl font-semibold text-gray-900"><%= property.name %></h3>
+                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                            <% if (property.status === 'available') { %>bg-green-100 text-green-800<% } %>
+                            <% if (property.status === 'occupied') { %>bg-red-100 text-red-800<% } %>
+                            <% if (property.status === 'maintenance') { %>bg-yellow-100 text-yellow-800<% } %>">
+                            <%= property.status %>
+                        </span>
+                    </div>
+                    
+                    <p class="text-gray-600 mb-4"><%= property.address %></p>
+                    
+                    <div class="grid grid-cols-3 gap-4 mb-4 text-sm text-gray-600">
+                        <div class="flex items-center">
+                            <i data-lucide="bed" class="w-4 h-4 mr-1"></i>
+                            <%= property.bedrooms %> bed
+                        </div>
+                        <div class="flex items-center">
+                            <i data-lucide="bath" class="w-4 h-4 mr-1"></i>
+                            <%= property.bathrooms %> bath
+                        </div>
+                        <div class="flex items-center">
+                            <i data-lucide="users" class="w-4 h-4 mr-1"></i>
+                            <%= property.max_guests %> guests
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="text-2xl font-bold text-gray-900">$<%= property.price_per_night %></span>
+                            <span class="text-gray-600">/night</span>
+                        </div>
+                        <a href="/properties/<%= property.id %>" class="text-blue-600 hover:text-blue-800 font-medium">
+                            View Details →
+                        </a>
+                    </div>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+
+    <% if (properties.length === 0) { %>
+        <div class="text-center py-12">
+            <i data-lucide="building" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No properties yet</h3>
+            <p class="text-gray-600 mb-4">Get started by adding your first property.</p>
+            <a href="/properties/create" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg inline-flex items-center">
+                <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                Add Property
+            </a>
+        </div>
+    <% } %>
+</div>
